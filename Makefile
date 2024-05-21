@@ -6,18 +6,18 @@
 #    By: sramos <sramos@student.codam.nl>             +#+                      #
 #                                                    +#+                       #
 #    Created: 2024/04/29 17:08:34 by sramos        #+#    #+#                  #
-#    Updated: 2024/04/29 17:10:42 by sramos        ########   odam.nl          #
+#    Updated: 2024/05/21 14:33:39 by sramos        ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = pipex
-SRC = 
+SRC = pipex.c\
 # Add all the src.c files here.
 
 OBJ = $(SRC:%.c=%.o)
 CC = cc
 RM = rm -f
-CFLAGS = -Wall -Werror -Wextra -Ilibft -g3
+CFLAGS = -Wall -Werror -Wextra -Ilibft -g3 #-g3 it's a debugger
 LIBFT_PATH = ./libft
 LIBFT = $(LIBFT_PATH)/libft.a
 
@@ -36,7 +36,7 @@ clean:
 	$(RM) $(OBJ)
 	make -C $(LIBFT_PATH) clean
 
-fclean:
+fclean: clean
 	$(RM) $(NAME)
 	make -C $(LIBFT_PATH) fclean
 
