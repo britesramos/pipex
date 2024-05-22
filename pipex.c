@@ -6,18 +6,11 @@
 /*   By: sramos <sramos@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/07 13:29:50 by sramos        #+#    #+#                 */
-/*   Updated: 2024/05/21 15:54:58 by sramos        ########   odam.nl         */
+/*   Updated: 2024/05/22 18:54:41 by sramos        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
-int	check_envp(char **envp, char *argv)
-{
-	//Have to split the envp.
-	//if it finds the cmd return 0.
-	//if it doenst find it return 1.
-}
 
 void	child_process(char **argv, char **envp, int *fd)
 {
@@ -25,30 +18,30 @@ void	child_process(char **argv, char **envp, int *fd)
 
 	fdin = open(argv[1], O_RDONLY);
 	if (!fdin)
-		perror("fdin was not createn on child_process.\n"); //needs also exit(EXIT_FAILURE).
+		perror("Error on open function (fdin).\n"); //needs also exit(EXIT_FAILURE).
 	close (fd[0]); //Close read end of the pipe.
-	if (check_envp(envp, argv) == 0) //cmd1 has to exist in the envp
-	{
-		if (dup2(fdin, STDIN_FILENO) == -1) //Redirect std input to the argv[1].
-			perror("Error on dup2 (STD_IN) child_process.\n"); //needs also exit(EXIT_FAILURE).
-		if (dup2(fd[1], STDOUT_FILENO) == -1) //Redirect std output to the write side of the pipe.
-			perror("Error on dup2 (STD_OUT) child_process.\n"); //needs also exit(EXIT_FAILURE).
-		else
-			execute() //Function to execute the cmd1 with the file1 input and fd[1] output.
-	}
-	else
-		perror("Cmd1 does not exist.\n"); //needs also exit(EXIT_FAILURE).
+	if (dup2(fdin, STDIN_FILENO) == -1) //Redirect std input to the argv[1].
+		perror("Error on dup2 (STD_IN) child_process.\n"); //needs also exit(EXIT_FAILURE).
+	if (dup2(fd[1], STDOUT_FILENO) == -1) //Redirect std output to the write side of the pipe.
+		perror("Error on dup2 (STD_OUT) child_process.\n"); //needs also exit(EXIT_FAILURE).
+	execute(envp, argv[2]);
 	close(fdin);
-
 }
 
 void	parent_process(char **argv, char **envp, int *fd)
 {
-	//close fd[1] and then open it?;
-	//cmd2 has to exist in the envp
-	//How does the fd[1] becomes fd[0]?? How does the pipe work?
-	//perform cmd2 in fd[0]
-	//cmd2 outputs argv[4]
+	int	fdout;
+
+	fdout = open(argv[4], O_RDONLY);
+	if (!fdout)
+		perror("Error on open function (fdout).\n"); //needs also exit(EXIT_FAILURE).
+	close (fd[1]);
+	if (dup2(fdout, STDOUT_FILENO) == -1)
+		perror("Error on dup2 (STD_OUT) parent_process.\n"); //needs also exit(EXIT_FAILURE).
+	if (dup2(fd[0], STDIN_FILENO) == -1)
+		perror("Error on dup2 (STD_OUT) child_process.\n"); //needs also exit(EXIT_FAILURE).
+	execute(envp, argv[3]);
+	close(fdout); //????
 }
 
 int	main(int argc, char **argv, char **envp)
