@@ -6,12 +6,13 @@
 #    By: sramos <sramos@student.codam.nl>             +#+                      #
 #                                                    +#+                       #
 #    Created: 2024/04/29 17:08:34 by sramos        #+#    #+#                  #
-#    Updated: 2024/05/21 14:33:39 by sramos        ########   odam.nl          #
+#    Updated: 2024/05/23 15:13:37 by sramos        ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = pipex
 SRC = pipex.c\
+pipex_utils.c\
 # Add all the src.c files here.
 
 OBJ = $(SRC:%.c=%.o)
