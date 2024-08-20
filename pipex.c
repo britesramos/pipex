@@ -6,7 +6,7 @@
 /*   By: sramos <sramos@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/07 13:29:50 by sramos        #+#    #+#                 */
-/*   Updated: 2024/05/30 13:44:09 by sramos        ########   odam.nl         */
+/*   Updated: 2024/08/20 17:20:42 by sramos        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,60 +16,67 @@ void	child1_process(char **argv, char **envp, int *fd)
 {
 	int	fdin;
 
-	fdin = open(argv[1], O_RDONLY);
+	fdin = open(argv[1], O_RDONLY, 0444);
 	if (!fdin)
-		ft_error_process(1);
-	close (fd[0]); //Close read end of the pipe.
-	if (dup2(fdin, STDIN_FILENO) == -1) //Redirect std input to the argv[1].
-		ft_error_process(2);
-	if (dup2(fd[1], STDOUT_FILENO) == -1) //Redirect std output to the write side of the pipe.
-		ft_error_process(3);
+		ft_error_process_child1(1);
+	close (fd[0]);
+	if (dup2(fdin, STDIN_FILENO) == -1)
+		ft_error_process_child1(2);
+	close(fdin);
+	if (dup2(fd[1], STDOUT_FILENO) == -1)
+		ft_error_process_child1(3);
+	close (fd[1]);
 	execute(envp, argv[2]);
-	close(fdin); //????
 }
 
 void	child2_process(char **argv, char **envp, int *fd)
 {
 	int	fdout;
 
-	fdout = open(argv[4], O_WRONLY);
+	fdout = open(argv[4], O_CREAT | O_TRUNC | O_RDWR, 0666);
 	if (!fdout)
-		ft_error_process(4);
+		ft_error_process_child2(4);
 	close (fd[1]);
 	if (dup2(fdout, STDOUT_FILENO) == -1)
-		ft_error_process(5);
+		ft_error_process_child2(5);
+	close(fdout);
 	if (dup2(fd[0], STDIN_FILENO) == -1)
-		ft_error_process(6);
+		ft_error_process_child2(6);
+	close (fd[0]);
 	execute(envp, argv[3]);
-	close(fdout); //????
 }
 
 int	main(int argc, char **argv, char **envp)
 {
-	int		fd[2]; //pipe ends, fd[1] and fd[0].
-	int		status; //children status.
-	pid_t	pid1; //Process ID child 1.
-	pid_t	pid2; //Process ID child 2.
+	int		fd[2];
+	int		status;
+	pid_t	pid1;
+	pid_t	pid2;
 
+	status = 0;
 	if (argc == 5)
 	{
 		if (pipe(fd) == -1)
 			ft_error(1);
-		pid1 = fork(); //It returns the PID of the child process.
+		pid1 = fork();
 		if (pid1 == -1)
 			ft_error(2);
 		if (pid1 == 0)
 			child1_process(argv, envp, fd);
-		if (waitpid(pid1, &status, 0) == -1)
-			ft_error(3);
 		pid2 = fork();
 		if (pid2 == -1)
 			ft_error(4);
 		if (pid2 == 0)
 			child2_process(argv, envp, fd);
+		close (fd[1]);
+		close (fd[0]);
+		if (waitpid(pid1, &status, 0) == -1)
+			ft_error(3);
+		if (waitpid(pid2, &status, 0) == -1)
+			ft_error(3);
+		exit(WEXITSTATUS(status));
 	}
 	else
 		ft_error(5);
-	// close(fd); //?????
 	return (0);
 }

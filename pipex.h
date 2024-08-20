@@ -6,7 +6,7 @@
 /*   By: sramos <sramos@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/09 12:49:10 by sramos        #+#    #+#                 */
-/*   Updated: 2024/05/30 13:41:45 by sramos        ########   odam.nl         */
+/*   Updated: 2024/08/20 15:25:37 by sramos        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ void	child2_process(char **argv, char **envp, int *fd);
 void	execute(char **envp, char *argv);
 char	*check_envp(char **envp, char *argv);
 void	ft_error(int num);
-void	ft_error_process(int num);
+void	ft_error_process_child1(int num);
+void	ft_error_process_child2(int num);
 
 #endif

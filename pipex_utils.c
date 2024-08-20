@@ -6,7 +6,7 @@
 /*   By: sramos <sramos@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/22 12:48:58 by sramos        #+#    #+#                 */
-/*   Updated: 2024/05/30 13:43:37 by sramos        ########   odam.nl         */
+/*   Updated: 2024/08/20 17:37:57 by sramos        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,12 @@ char	*check_envp(char **envp, char *cmd)
 	char	**paths;
 	char	*temp;
 	int		i;
-	int 	j;
+	int		j;
 
 	i = 0;
 	j = 1;
-	if(access(cmd, X_OK) == 0)
-		return(cmd);
+	if (access(cmd, X_OK) == 0)
+		return (cmd);
 	while (ft_strnstr(envp[i], "PATH=", 5) == 0)
 		i++;
 	paths = ft_split(envp[i] + 5, ':');
@@ -35,28 +35,29 @@ char	*check_envp(char **envp, char *cmd)
 		free(paths[i]);
 		paths[i] = ft_strjoin(temp, cmd);
 		free(temp);
-		if(access(paths[i], X_OK) == 0)
+		if (access(paths[i], X_OK) == 0)
 		{
-			while(paths[i + j] != NULL)
+			while (paths[i + j] != NULL)
 			{
 				free(paths[i + j]);
 				j++;
 			}
 			temp = paths[i];
 			free(paths);
-			return(temp);
+			return (temp);
 		}
 		free(paths[i]);
 		i++;
 	}
 	free(paths);
-	return(0);
+	return (0);
 }
 
 void	execute(char **envp, char *argv)
 {
 	char	**cmd;
 	char	*path;
+	int		i = 0;
 
 	cmd = ft_split(argv, ' '); //dont forget to free.
 	path = check_envp(envp, cmd[0]);
@@ -64,7 +65,14 @@ void	execute(char **envp, char *argv)
 		perror("Error on finding the comand.\n"); //Needs exit???
 	else if (execve(path, cmd, envp) == -1)
 		perror("Execve error!\n");
+	while (cmd[i])
+	{
+		free(cmd[i]);
+		i++;
+	}
+	free(cmd);
 	free(path);
+	exit (127);
 }
 
 void	ft_error(int num)
@@ -78,11 +86,11 @@ void	ft_error(int num)
 	else if (num == 4)
 		perror("Error on forking child 2.\n");
 	else if (num == 5)
-		perror("Invalid input!\nCorrect input: './pipex file1 cmd1 cmd2 file2'");
+		perror("Invalid input!\nCorrect input:'./pipex file1 cmd1 cmd2 file2'");
 	exit(EXIT_FAILURE);
 }
 
-void	ft_error_process(int num)
+void	ft_error_process_child1(int num)
 {
 	if (num == 1)
 		perror("Error on open function (fdin).\n");
@@ -90,6 +98,11 @@ void	ft_error_process(int num)
 		perror("Error on dup2 (STD_IN) child1_process.\n");
 	if (num == 3)
 		perror("Error on dup2 (STD_OUT) child1_process.\n");
+	exit(EXIT_SUCCESS);
+}
+
+void	ft_error_process_child2(int num)
+{
 	if (num == 4)
 		perror("Error on open function (fdout).\n");
 	if (num == 5)
