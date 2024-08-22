@@ -6,19 +6,18 @@
 #    By: sramos <sramos@student.codam.nl>             +#+                      #
 #                                                    +#+                       #
 #    Created: 2024/04/29 17:08:34 by sramos        #+#    #+#                  #
-#    Updated: 2024/05/23 15:13:37 by sramos        ########   odam.nl          #
+#    Updated: 2024/08/22 10:07:58 by sramos        ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = pipex
 SRC = pipex.c\
-pipex_utils.c\
-# Add all the src.c files here.
+pipex_utils.c
 
 OBJ = $(SRC:%.c=%.o)
 CC = cc
 RM = rm -f
-CFLAGS = -Wall -Werror -Wextra -Ilibft -g3 #-g3 it's a debugger
+CFLAGS = -Wall -Werror -Wextra -Ilibft -g3
 LIBFT_PATH = ./libft
 LIBFT = $(LIBFT_PATH)/libft.a
 

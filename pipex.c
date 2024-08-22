@@ -6,7 +6,7 @@
 /*   By: sramos <sramos@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/07 13:29:50 by sramos        #+#    #+#                 */
-/*   Updated: 2024/08/20 17:20:42 by sramos        ########   odam.nl         */
+/*   Updated: 2024/08/22 10:47:47 by sramos        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,15 +35,26 @@ void	child2_process(char **argv, char **envp, int *fd)
 
 	fdout = open(argv[4], O_CREAT | O_TRUNC | O_RDWR, 0666);
 	if (!fdout)
-		ft_error_process_child2(4);
+		ft_error(6);
 	close (fd[1]);
 	if (dup2(fdout, STDOUT_FILENO) == -1)
-		ft_error_process_child2(5);
+		ft_error(7);
 	close(fdout);
 	if (dup2(fd[0], STDIN_FILENO) == -1)
-		ft_error_process_child2(6);
+		ft_error(8);
 	close (fd[0]);
 	execute(envp, argv[3]);
+}
+
+void	end_program(int fd[], pid_t pid1, pid_t pid2, int status)
+{
+	close (fd[1]);
+	close (fd[0]);
+	if (waitpid(pid1, &status, 0) == -1)
+		ft_error(3);
+	if (waitpid(pid2, &status, 0) == -1)
+		ft_error(3);
+	exit(WEXITSTATUS(status));
 }
 
 int	main(int argc, char **argv, char **envp)
@@ -68,13 +79,7 @@ int	main(int argc, char **argv, char **envp)
 			ft_error(4);
 		if (pid2 == 0)
 			child2_process(argv, envp, fd);
-		close (fd[1]);
-		close (fd[0]);
-		if (waitpid(pid1, &status, 0) == -1)
-			ft_error(3);
-		if (waitpid(pid2, &status, 0) == -1)
-			ft_error(3);
-		exit(WEXITSTATUS(status));
+		end_program(fd, pid1, pid2, status);
 	}
 	else
 		ft_error(5);

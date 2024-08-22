@@ -6,29 +6,18 @@
 /*   By: sramos <sramos@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/22 12:48:58 by sramos        #+#    #+#                 */
-/*   Updated: 2024/08/20 17:37:57 by sramos        ########   odam.nl         */
+/*   Updated: 2024/08/22 10:38:55 by sramos        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-char	*check_envp(char **envp, char *cmd)
+char	*find_path(char *cmd, char **paths, int i)
 {
-	char	**paths;
 	char	*temp;
-	int		i;
 	int		j;
 
-	i = 0;
 	j = 1;
-	if (access(cmd, X_OK) == 0)
-		return (cmd);
-	while (ft_strnstr(envp[i], "PATH=", 5) == 0)
-		i++;
-	paths = ft_split(envp[i] + 5, ':');
-	if (!paths)
-		exit(1);
-	i = 0;
 	while (paths[i])
 	{
 		temp = ft_strjoin(paths[i], "/");
@@ -49,6 +38,29 @@ char	*check_envp(char **envp, char *cmd)
 		free(paths[i]);
 		i++;
 	}
+	return (0);
+}
+
+char	*check_envp(char **envp, char *cmd)
+{
+	char	**paths;
+	char	*temp;
+	int		i;
+	int		j;
+
+	i = 0;
+	j = 1;
+	if (access(cmd, X_OK) == 0)
+		return (cmd);
+	while (ft_strnstr(envp[i], "PATH=", 5) == 0)
+		i++;
+	paths = ft_split(envp[i] + 5, ':');
+	if (!paths)
+		exit(1);
+	i = 0;
+	temp = find_path(cmd, paths, i);
+	if (temp)
+		return (temp);
 	free(paths);
 	return (0);
 }
@@ -57,12 +69,13 @@ void	execute(char **envp, char *argv)
 {
 	char	**cmd;
 	char	*path;
-	int		i = 0;
+	int		i;
 
-	cmd = ft_split(argv, ' '); //dont forget to free.
+	i = 0;
+	cmd = ft_split(argv, ' ');
 	path = check_envp(envp, cmd[0]);
 	if (!path)
-		perror("Error on finding the comand.\n"); //Needs exit???
+		perror("Error on finding the comand.\n");
 	else if (execve(path, cmd, envp) == -1)
 		perror("Execve error!\n");
 	while (cmd[i])
@@ -87,6 +100,12 @@ void	ft_error(int num)
 		perror("Error on forking child 2.\n");
 	else if (num == 5)
 		perror("Invalid input!\nCorrect input:'./pipex file1 cmd1 cmd2 file2'");
+	else if (num == 6)
+		perror("Error on open function (fdout).\n");
+	else if (num == 7)
+		perror("Error on dup2 (STD_OUT) child2_process.\n");
+	else if (num == 8)
+		perror("Error on dup2 (STD_IN) child2_process.\n");
 	exit(EXIT_FAILURE);
 }
 
@@ -94,20 +113,9 @@ void	ft_error_process_child1(int num)
 {
 	if (num == 1)
 		perror("Error on open function (fdin).\n");
-	if (num == 2)
+	else if (num == 2)
 		perror("Error on dup2 (STD_IN) child1_process.\n");
-	if (num == 3)
+	else if (num == 3)
 		perror("Error on dup2 (STD_OUT) child1_process.\n");
 	exit(EXIT_SUCCESS);
-}
-
-void	ft_error_process_child2(int num)
-{
-	if (num == 4)
-		perror("Error on open function (fdout).\n");
-	if (num == 5)
-		perror("Error on dup2 (STD_OUT) child2_process.\n");
-	if (num == 6)
-		perror("Error on dup2 (STD_IN) child2_process.\n");
-	exit(EXIT_FAILURE);
 }
