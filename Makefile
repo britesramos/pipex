@@ -34,11 +34,9 @@ $(LIBFT):
 
 clean:
 	$(RM) $(OBJ)
-	make -C $(LIBFT_PATH) clean
 
 fclean: clean
 	$(RM) $(NAME)
-	make -C $(LIBFT_PATH) fclean
 
 re: fclean all
 
