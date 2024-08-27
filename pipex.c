@@ -16,7 +16,7 @@ void	child1_process(char **argv, char **envp, int *fd)
 {
 	int	fdin;
 
-	fdin = open(argv[1], O_RDONLY, 0444);
+	fdin = open(argv[1], O_RDONLY);
 	if (!fdin)
 		ft_error_process_child1(1);
 	close (fd[0]);
