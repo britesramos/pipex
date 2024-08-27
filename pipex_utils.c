@@ -46,10 +46,8 @@ char	*check_envp(char **envp, char *cmd)
 	char	**paths;
 	char	*temp;
 	int		i;
-	int		j;
 
 	i = 0;
-	j = 1;
 	if (access(cmd, X_OK) == 0)
 		return (cmd);
 	while (ft_strnstr(envp[i], "PATH=", 5) == 0)
